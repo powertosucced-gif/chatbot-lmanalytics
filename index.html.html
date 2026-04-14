@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LManalytics — Chatbot Builder</title>
+  <style>
+    :root {
+      --primary: #1a73e8;
+      --primary-dark: #1557b0;
+      --accent: #0d47a1;
+      --bg: #f0f4ff;
+      --card: #ffffff;
+      --text: #1e1e2e;
+      --muted: #6b7280;
+      --border: #dde3f0;
+      --success: #10b981;
+      --radius: 14px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* HEADER */
+    header {
+      background: linear-gradient(135deg, #0d47a1 0%, #1a73e8 100%);
+      color: white;
+      padding: 22px 40px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 4px 20px rgba(13,71,161,.3);
+    }
+    .logo-box {
+      width: 46px; height: 46px;
+      background: rgba(255,255,255,.2);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; font-weight: 900; color: white;
+    }
+    header h1 { font-size: 22px; font-weight: 800; letter-spacing: -.5px; }
+    header p  { font-size: 13px; opacity: .8; margin-top: 2px; }
+    .badge {
+      margin-left: auto;
+      background: rgba(255,255,255,.2);
+      border: 1px solid rgba(255,255,255,.3);
+      padding: 5px 14px;
+      border-radius: 30px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    /* LAYOUT */
+    .container {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 36px 24px;
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      gap: 28px;
+    }
+    @media(max-width:900px){ .container{ grid-template-columns:1fr; } }
+
+    /* CARDS */
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 28px;
+      box-shadow: 0 2px 16px rgba(0,0,0,.07);
+      margin-bottom: 20px;
+    }
+    .card-title {
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--primary);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-title::before {
+      content: '';
+      display: inline-block;
+      width: 4px; height: 18px;
+      background: var(--primary);
+      border-radius: 4px;
+    }
+
+    /* CLIENTS BAR */
+    .clients-bar {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      box-shadow: 0 2px 16px rgba(0,0,0,.07);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .clients-bar span { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+    .client-chip {
+      background: var(--bg);
+      border: 2px solid var(--border);
+      padding: 6px 16px;
+      border-radius: 30px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s;
+      color: var(--text);
+    }
+    .client-chip:hover, .client-chip.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+    }
+    .client-chip.add {
+      background: transparent;
+      border-style: dashed;
+      color: var(--muted);
+    }
+    .client-chip.add:hover { background: var(--bg); color: var(--primary); border-color: var(--primary); }
+
+    /* FORM */
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 6px;
+      margin-top: 16px;
+    }
+    label:first-of-type { margin-top: 0; }
+    input[type=text], input[type=tel], input[type=url], textarea, select {
+      width: 100%;
+      padding: 13px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--text);
+      background: #fafbff;
+      transition: border .2s;
+      outline: none;
+    }
+    input:focus, textarea:focus, select:focus { border-color: var(--primary); background: #fff; }
+    textarea { resize: vertical; min-height: 72px; }
+
+    .color-row { display: flex; align-items: center; gap: 10px; }
+    input[type=color] {
+      width: 52px; height: 44px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 4px;
+      cursor: pointer;
+      background: #fafbff;
+    }
+    .color-hex {
+      flex: 1;
+    }
+
+    /* BUTTONS INPUT */
+    .btns-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+    .btn-row { display: flex; gap: 8px; align-items: center; }
+    .btn-row input { flex: 1; }
+    .btn-del {
+      width: 36px; height: 36px;
+      border: none;
+      border-radius: 8px;
+      background: #fee2e2;
+      color: #ef4444;
+      cursor: pointer;
+      font-size: 18px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .add-btn-link {
+      color: var(--primary);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
+      text-decoration: underline;
+    }
+
+    /* TOGGLE */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .toggle-row:last-child { border-bottom: none; }
+    .toggle-info { font-size: 14px; font-weight: 600; }
+    .toggle-info small { display: block; font-size: 12px; color: var(--muted); font-weight: 400; margin-top: 2px; }
+    .switch { position: relative; display: inline-block; width: 46px; height: 26px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+      background: #d1d5db; border-radius: 34px; transition: .3s;
+    }
+    .slider:before {
+      content: ''; position: absolute;
+      height: 20px; width: 20px;
+      left: 3px; bottom: 3px;
+      background: white; border-radius: 50%; transition: .3s;
+    }
+    input:checked + .slider { background: var(--primary); }
+    input:checked + .slider:before { transform: translateX(20px); }
+
+    /* GENERATE BUTTON */
+    .gen-btn {
+      width: 100%;
+      padding: 17px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #0d47a1, #1a73e8);
+      color: white;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      margin-top: 24px;
+      letter-spacing: .3px;
+      box-shadow: 0 6px 20px rgba(26,115,232,.4);
+      transition: transform .15s, box-shadow .15s;
+    }
+    .gen-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(26,115,232,.45); }
+    .gen-btn:active { transform: translateY(0); }
+
+    /* RIGHT COLUMN */
+    .sticky-right { position: sticky; top: 24px; }
+
+    /* PREVIEW */
+    .preview-box {
+      background: #1e1e2e;
+      border-radius: var(--radius);
+      padding: 0;
+      overflow: hidden;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 30px rgba(0,0,0,.2);
+    }
+    .preview-bar {
+      background: #2a2a3e;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .dot { width: 12px; height: 12px; border-radius: 50%; }
+    .preview-bar span { font-size: 12px; color: #6b7280; margin-left: 8px; }
+    .preview-content {
+      padding: 20px;
+      min-height: 320px;
+      position: relative;
+      background: #f8faff;
+      display: flex;
+      align-items: flex-end;
+      justify-content: flex-end;
+    }
+    .chat-preview {
+      width: 300px;
+      background: white;
+      border-radius: 18px;
+      box-shadow: 0 12px 40px rgba(0,0,0,.2);
+      overflow: hidden;
+      animation: pop .3s ease-out;
+    }
+    @keyframes pop { from{transform:scale(.95);opacity:0} to{transform:scale(1);opacity:1} }
+    .chat-hdr {
+      padding: 32px 16px 18px;
+      text-align: center;
+      position: relative;
+    }
+    .chat-hdr h4 { color: white; font-size: 16px; font-weight: 800; margin: 0; }
+    .chat-hdr p  { color: rgba(255,255,255,.9); font-size: 13px; margin-top: 4px; }
+    .chat-x { position: absolute; top: 10px; right: 12px; color: rgba(255,255,255,.7); font-size: 20px; cursor: pointer; }
+    .chat-body { padding: 14px; }
+    .chat-agent { display: flex; gap: 8px; margin-bottom: 12px; }
+    .chat-agent-msg { background: #f2f2f2; padding: 10px 12px; border-radius: 0 12px 12px 12px; font-size: 12px; color: #444; line-height: 1.4; }
+    .chat-btn-prev {
+      display: block; width: 100%; padding: 12px;
+      border: none; border-radius: 10px;
+      color: white; font-weight: 700; font-size: 13px;
+      margin-bottom: 8px; cursor: default;
+    }
+    .chat-btn-prev:last-child { margin-bottom: 0; }
+    .chat-foot { padding: 10px; text-align: center; font-size: 10px; color: #aaa; border-top: 1px solid #f0f0f0; }
+    .chat-foot a { color: #aaa; text-decoration: none; font-weight: 700; }
+
+    /* CODE OUTPUT */
+    .code-card { background: var(--card); border-radius: var(--radius); box-shadow: 0 2px 16px rgba(0,0,0,.07); overflow: hidden; }
+    .code-header {
+      background: #1e1e2e;
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .code-header span { color: #a0aec0; font-size: 12px; font-weight: 700; }
+    .copy-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .copy-btn:hover { background: var(--primary-dark); }
+    #codeOutput {
+      background: #1e1e2e;
+      color: #a8ff78;
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      padding: 16px 18px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+      max-height: 320px;
+      overflow-y: auto;
+      display: none;
+    }
+    .install-box {
+      padding: 16px 18px;
+      background: #f0fff8;
+      border-top: 1px solid #d1fae5;
+    }
+    .install-box p { font-size: 13px; color: #065f46; font-weight: 600; }
+    .install-box small { font-size: 12px; color: #047857; display: block; margin-top: 4px; }
+    .install-box a { color: var(--primary); font-weight: 700; }
+
+    /* SECTOR TAGS */
+    .sector-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+    .sector-tag {
+      padding: 7px 14px;
+      border-radius: 8px;
+      border: 1.5px solid var(--border);
+      font-size: 13px;
+      cursor: pointer;
+      transition: all .15s;
+      background: #fafbff;
+    }
+    .sector-tag.sel { background: var(--primary); color: white; border-color: var(--primary); }
+
+    /* SUCCESS TOAST */
+    #toast {
+      position: fixed; bottom: 30px; right: 30px;
+      background: var(--success);
+      color: white; padding: 14px 22px;
+      border-radius: 12px; font-weight: 700; font-size: 14px;
+      box-shadow: 0 8px 24px rgba(16,185,129,.4);
+      display: none; z-index: 9999;
+      animation: slideIn .3s ease-out;
+    }
+    @keyframes slideIn { from{transform:translateY(20px);opacity:0} to{transform:translateY(0);opacity:1} }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo-box">L</div>
+  <div>
+    <h1>LManalytics — Chatbot Builder</h1>
+    <p>Crea widgets de chatbot personalizados para tus clientes</p>
+  </div>
+  <div class="badge">⚡ Pro</div>
+</header>
+
+<div class="container">
+
+  <!-- LEFT: FORM -->
+  <div>
+
+    <!-- CLIENTS -->
+    <div class="clients-bar">
+      <span>Clientes</span>
+      <div class="client-chip active" onclick="selectClient(this,'demo')">Demo</div>
+      <button class="client-chip add" onclick="newClient()">+ Nuevo cliente</button>
+    </div>
+
+    <!-- IDENTIDAD -->
+    <div class="card">
+      <div class="card-title">Identidad del negocio</div>
+
+      <label>Nombre del negocio *</label>
+      <input type="text" id="nombre" placeholder="Ej: Concesionario Pérez" oninput="updatePreview()" />
+
+      <label>Color de marca *</label>
+      <div class="color-row">
+        <input type="color" id="colorPicker" value="#1a73e8" oninput="syncColor(this.value)" />
+        <input type="text" id="colorHex" class="color-hex" value="#1a73e8" placeholder="#1a73e8" oninput="syncHex(this.value)" />
+      </div>
+
+      <label>Sector</label>
+      <div class="sector-tags" id="sectorTags">
+        <div class="sector-tag sel" onclick="setSector(this,'Automoción')">🚗 Automoción</div>
+        <div class="sector-tag" onclick="setSector(this,'Inmobiliaria')">🏠 Inmobiliaria</div>
+        <div class="sector-tag" onclick="setSector(this,'Restaurante')">🍽️ Restaurante</div>
+        <div class="sector-tag" onclick="setSector(this,'Clínica')">🏥 Clínica</div>
+        <div class="sector-tag" onclick="setSector(this,'Ecommerce')">🛒 Ecommerce</div>
+        <div class="sector-tag" onclick="setSector(this,'Otro')">✏️ Otro</div>
+      </div>
+    </div>
+
+    <!-- CONTACTO -->
+    <div class="card">
+      <div class="card-title">Contacto & WhatsApp</div>
+
+      <label>Número WhatsApp (con prefijo país, sin +)</label>
+      <input type="tel" id="wa" placeholder="Ej: 34612345678" oninput="updatePreview()" />
+
+      <label>Texto del botón WhatsApp</label>
+      <input type="text" id="waLabel" placeholder="Ej: ¿Hablamos?" value="¿Hablamos?" oninput="updatePreview()" />
+
+      <label>Mensaje pre-rellenado al abrir WhatsApp</label>
+      <input type="text" id="waMsg" value="Hola, me gustaría recibir más información." oninput="updatePreview()" />
+    </div>
+
+    <!-- CHATBOT -->
+    <div class="card">
+      <div class="card-title">Chatbot</div>
+
+      <label>Mensaje del agente en el formulario</label>
+      <textarea id="agentMsg" oninput="updatePreview()">Genial, completa tus datos y un comercial de nuestro equipo se pondrá en contacto contigo muy pronto.</textarea>
+
+      <label>Botones de acción (máx. 4)</label>
+      <div class="btns-list" id="btnsList"></div>
+      <button class="add-btn-link" onclick="addBtn()">+ Agregar botón</button>
+    </div>
+
+    <!-- GHL WEBHOOK -->
+    <div class="card">
+      <div class="card-title">Integración GoHighLevel</div>
+
+      <div class="toggle-row">
+        <div class="toggle-info">
+          Activar integración CRM
+          <small>Los leads se envían automáticamente a GHL</small>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="ghlToggle" checked onchange="updatePreview()" />
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div id="webhookSection">
+        <label>Webhook URL de GoHighLevel *</label>
+        <input type="url" id="webhook" placeholder="https://services.leadconnectorhq.com/hooks/..." oninput="updatePreview()" />
+        <small style="color:var(--muted);font-size:12px;margin-top:6px;display:block;">
+          📍 En GHL: Automatización → Webhooks → Crear webhook → copia la URL aquí
+        </small>
+      </div>
+
+      <div class="toggle-row" style="margin-top:16px;">
+        <div class="toggle-info">
+          Abrir WhatsApp después de enviar
+          <small>El cliente pasa directo a WhatsApp tras completar el formulario</small>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="waAfter" checked />
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="toggle-row">
+        <div class="toggle-info">
+          Abrir chatbot automáticamente
+          <small>Se despliega solo después de 2.5 segundos en la página</small>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="autoOpen" checked />
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <button class="gen-btn" onclick="generateCode()">⚡ Generar Chatbot</button>
+
+  </div>
+
+  <!-- RIGHT: PREVIEW + CODE -->
+  <div class="sticky-right">
+
+    <!-- LIVE PREVIEW -->
+    <div class="card" style="margin-bottom:20px;">
+      <div class="card-title">Vista previa en vivo</div>
+      <div style="background:#f8faff;border-radius:12px;min-height:360px;position:relative;padding:20px;display:flex;align-items:flex-end;justify-content:flex-end;border:1.5px solid var(--border);">
+        <div class="chat-preview" id="chatPreview">
+          <div class="chat-hdr" id="chatHdr" style="background:#1a73e8;">
+            <span class="chat-x">×</span>
+            <h4 id="prevName">Tu negocio</h4>
+            <p id="prevMsg">¡Hola! 👋 ¿En qué podemos ayudarte?</p>
+          </div>
+          <div class="chat-body" id="chatBody"></div>
+          <div class="chat-foot">Desarrollado por <a href="#">LManalytics</a></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CODE OUTPUT -->
+    <div class="code-card" id="codeCard" style="display:none;">
+      <div class="code-header">
+        <span>📋 Tu código listo para instalar</span>
+        <button class="copy-btn" onclick="copyCode()">Copiar código</button>
+      </div>
+      <pre id="codeOutput"></pre>
+      <div class="install-box">
+        <p>✅ ¿Cómo instalar en GoHighLevel?</p>
+        <small>Ve a <strong>Sitios → Tu sitio → Configuración → Código de cabecera</strong> y pega el código. Luego haz clic en <strong>Publicar</strong>.</small>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="toast">✅ ¡Código copiado al portapapeles!</div>
+
+<script>
+  // --- STATE ---
+  var btns = ['Comprar coche 🚗', 'Solicitar información 📋'];
+
+  // --- INIT ---
+  window.onload = function(){
+    renderBtns();
+    updatePreview();
+    document.getElementById('ghlToggle').addEventListener('change', function(){
+      document.getElementById('webhookSection').style.display = this.checked ? 'block' : 'none';
+    });
+  };
+
+  // --- SECTOR ---
+  function setSector(el, name){
+    document.querySelectorAll('.sector-tag').forEach(function(t){ t.classList.remove('sel'); });
+    el.classList.add('sel');
+    // auto-populate buttons for sector
+    var presets = {
+      'Automoción': ['Comprar coche 🚗','Taller 🔨','Tasación 💰'],
+      'Inmobiliaria': ['Ver propiedades 🏠','Vender mi piso 💶','Valoración gratuita 📊'],
+      'Restaurante': ['Reservar mesa 🍽️','Ver carta 📖','Pedir a domicilio 🛵'],
+      'Clínica': ['Pedir cita 📅','Consultar servicios 💊','Urgencias 🚨'],
+      'Ecommerce': ['Ver productos 🛒','Estado de mi pedido 📦','Hablar con soporte 💬'],
+      'Otro': ['Más información ℹ️','Contactar ahora 📞']
+    };
+    if(presets[name]){ btns = presets[name].slice(); renderBtns(); updatePreview(); }
+  }
+
+  // --- BUTTONS ---
+  function renderBtns(){
+    var list = document.getElementById('btnsList');
+    list.innerHTML = '';
+    btns.forEach(function(b, i){
+      var row = document.createElement('div');
+      row.className = 'btn-row';
+      row.innerHTML = '<input type="text" value="'+b+'" onchange="btns['+i+']=this.value;updatePreview()" oninput="btns['+i+']=this.value;updatePreview()" /><button class="btn-del" onclick="delBtn('+i+')">×</button>';
+      list.appendChild(row);
+    });
+  }
+  function addBtn(){
+    if(btns.length >= 4){ alert('Máximo 4 botones'); return; }
+    btns.push('Nuevo botón');
+    renderBtns(); updatePreview();
+  }
+  function delBtn(i){
+    btns.splice(i,1);
+    renderBtns(); updatePreview();
+  }
+
+  // --- COLOR ---
+  function syncColor(v){ document.getElementById('colorHex').value = v; updatePreview(); }
+  function syncHex(v){
+    if(/^#[0-9A-Fa-f]{6}$/.test(v)){ document.getElementById('colorPicker').value = v; updatePreview(); }
+  }
+
+  // --- CLIENTS ---
+  function selectClient(el, id){ document.querySelectorAll('.client-chip').forEach(function(c){ c.classList.remove('active'); }); el.classList.add('active'); }
+  function newClient(){ var n=prompt('Nombre del nuevo cliente:'); if(n){ var bar=document.getElementById('clientsBar'); } }
+
+  // --- LIVE PREVIEW ---
+  function updatePreview(){
+    var name  = document.getElementById('nombre').value || 'Tu negocio';
+    var color = document.getElementById('colorHex').value || '#1a73e8';
+    var msg   = document.getElementById('agentMsg').value || '';
+
+    document.getElementById('prevName').textContent = name;
+    document.getElementById('chatHdr').style.background = color;
+
+    var body = document.getElementById('chatBody');
+    body.innerHTML = '';
+
+    if(msg){
+      var arow = document.createElement('div');
+      arow.className = 'chat-agent';
+      arow.innerHTML = '<div class="chat-agent-msg">'+msg+'</div>';
+      body.appendChild(arow);
+    }
+
+    btns.forEach(function(b){
+      if(!b) return;
+      var btn = document.createElement('button');
+      btn.className = 'chat-btn-prev';
+      btn.style.background = color;
+      btn.textContent = b;
+      body.appendChild(btn);
+    });
+  }
+
+  // --- GENERATE ---
+  function generateCode(){
+    var nombre   = document.getElementById('nombre').value;
+    var color    = document.getElementById('colorHex').value || '#1a73e8';
+    var wa       = document.getElementById('wa').value;
+    var waLabel  = document.getElementById('waLabel').value || '¿Hablamos?';
+    var waMsg    = document.getElementById('waMsg').value || 'Hola, me gustaría recibir más información.';
+    var agentMsg = document.getElementById('agentMsg').value;
+    var webhook  = document.getElementById('webhook').value;
+    var ghlOn    = document.getElementById('ghlToggle').checked;
+    var waAfter  = document.getElementById('waAfter').checked;
+    var autoOpen = document.getElementById('autoOpen').checked;
+
+    if(!nombre){ alert('Por favor ingresa el nombre del negocio'); return; }
+
+    var slug = nombre.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
+    var config = {
+      nombre: nombre, color: color, wa: wa,
+      waLabel: waLabel, waMsg: waMsg, agentMsg: agentMsg,
+      webhook: ghlOn ? webhook : '',
+      btns: btns.filter(function(b){ return b.trim(); }),
+      slug: slug,
+      updatedAt: new Date().toISOString()
+    };
+
+    var code = generateScript(config, waAfter, autoOpen);
+    document.getElementById('codeOutput').textContent = '<script>\n' + code + '\n<\/script>';
+    document.getElementById('codeOutput').style.display = 'block';
+    document.getElementById('codeCard').style.display = 'block';
+    document.getElementById('codeCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function generateScript(c, waAfter, autoOpen){
+    var btnsJson = JSON.stringify(c.btns);
+    var configLine = '/* CONFIG:' + JSON.stringify(c) + ' */';
+    return configLine + '\n/* LManalytics — Chatbot Web */\n(function(){\n  function init(){\n    if(window._lmBot)return;\n    window._lmBot=true;\n    var N='+JSON.stringify(c.nombre)+';\n    var COLOR='+JSON.stringify(c.color)+';\n    var WA='+JSON.stringify(c.wa)+';\n    var WA_LABEL='+JSON.stringify(c.waLabel)+';\n    var WA_MSG='+JSON.stringify(c.waMsg)+';\n    var AGENT_MSG='+JSON.stringify(c.agentMsg)+';\n    var BTNS='+btnsJson+';\n    var WEBHOOK='+JSON.stringify(c.webhook)+';\n    var WA_AFTER='+(waAfter?'true':'false')+';\n    var s={isOpen:false,intent:\'\'};\n    var st=document.createElement(\'style\');\n    st.innerHTML=`\n      #lm-wa{position:fixed;bottom:25px;left:25px;z-index:9999998;text-decoration:none;}\n      .lm-wa-btn{background:#25D366;color:#fff;padding:11px 20px;border-radius:50px;font-weight:700;display:flex;align-items:center;gap:8px;box-shadow:0 6px 18px rgba(0,0,0,.15);font-size:14px;font-family:-apple-system,sans-serif;}\n      #lm-wrap{position:fixed;bottom:25px;right:25px;z-index:9999999;font-family:-apple-system,sans-serif;display:flex;flex-direction:column;align-items:flex-end;gap:5px;}\n      .lm-badge{background:#fff;padding:5px 13px;border-radius:30px;font-size:12px;font-weight:700;color:#333;box-shadow:0 3px 12px rgba(0,0,0,.1);border:1px solid #eee;white-space:nowrap;display:inline-flex;align-items:center;gap:5px;}\n      .lm-dot{width:7px;height:7px;border-radius:50%;background:#25D366;display:inline-block;}\n      .lm-trig{width:58px;height:58px;background:CPH;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(0,0,0,.2);}\n      .lm-card{display:none;width:340px;background:#fff;border-radius:22px;box-shadow:0 18px 45px rgba(0,0,0,.2);overflow:visible;animation:lmPop .3s ease-out;margin-bottom:2px;}\n      @keyframes lmPop{from{transform:scale(.95);opacity:0}to{transform:scale(1);opacity:1}}\n      .lm-hdr{padding:44px 18px 20px;text-align:center;position:relative;border-radius:22px 22px 0 0;}\n      .lm-hdr h3{margin:6px 0 0;font-size:17px;font-weight:800;color:#fff;}\n      .lm-hdr p{margin:6px 0 0;font-size:14px;color:#fff;opacity:.95;line-height:1.3;}\n      .lm-x{position:absolute;top:13px;right:14px;cursor:pointer;font-size:22px;color:#fff;opacity:.7;}\n      .lm-bk{position:absolute;top:13px;left:18px;cursor:pointer;font-size:20px;color:#fff;display:none;}\n      .lm-body{padding:20px 18px;}\n      .lm-arow{display:flex;gap:9px;margin-bottom:16px;align-items:flex-start;}\n      .lm-amsg{font-size:13px;color:#444;background:#f2f2f2;padding:11px 14px;border-radius:0 13px 13px 13px;line-height:1.4;}\n      .lm-btn{width:100%;padding:15px;margin-bottom:10px;border:none;border-radius:13px;background:CPH;color:#fff;cursor:pointer;font-size:15px;font-weight:700;font-family:-apple-system,sans-serif;}\n      .lm-btn:last-child{margin-bottom:0;}\n      .lm-inp{width:100%;padding:14px;border:1px solid #ddd;border-radius:13px;box-sizing:border-box;font-size:14px;margin-bottom:10px;outline:none;text-align:center;font-family:-apple-system,sans-serif;}\n      .lm-inp:focus{border-color:CPH;}\n      .lm-send{width:100%;padding:15px;border:none;border-radius:13px;background:CPH;color:#fff;cursor:pointer;font-size:15px;font-weight:700;margin-bottom:8px;font-family:-apple-system,sans-serif;}\n      .lm-bkf{width:100%;padding:11px;border:.5px solid #ddd;border-radius:13px;background:#f5f5f5;color:#555;cursor:pointer;font-size:13px;font-family:-apple-system,sans-serif;}\n      .lm-foot{padding:12px;text-align:center;font-size:11px;color:#888;border-top:1px solid #f0f0f0;}\n      .lm-foot a{color:#888;text-decoration:none;font-weight:700;}\n    `.replace(/CPH/g,COLOR);\n    document.head.appendChild(st);\n    var waEl=document.createElement(\'a\');\n    waEl.id=\'lm-wa\';\n    waEl.href=\'https://wa.me/\'+WA+\'?text=\'+encodeURIComponent(WA_MSG);\n    waEl.target=\'_blank\';\n    waEl.innerHTML=\'<div class="lm-wa-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.096.541 4.064 1.487 5.782L0 24l6.395-1.671A11.94 11.94 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.028-1.38l-.36-.214-3.733.976.999-3.638-.235-.374A9.817 9.817 0 012.182 12c0-5.42 4.398-9.818 9.818-9.818 5.42 0 9.818 4.398 9.818 9.818 0 5.42-4.398 9.818-9.818 9.818z"/></svg>\'+WA_LABEL+\'</div>\';\n    document.body.appendChild(waEl);\n    var wrap=document.createElement(\'div\');\n    wrap.id=\'lm-wrap\';\n    wrap.innerHTML=\'<div id="lm-card" class="lm-card"><div class="lm-hdr" style="background:\'+COLOR+\'"><span id="lm-bk" class="lm-bk" onclick="window._lmBk()">←</span><span class="lm-x" onclick="window._lmTog()">×</span><h3>\'+N+\'</h3><p>¡Hola! 👋 ¿En qué podemos ayudarte?</p></div><div id="lm-body" class="lm-body"></div><div class="lm-foot">Desarrollado por <a href="https://lmanalytics.es/" target="_blank">LManalytics</a></div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;"><div class="lm-badge">En línea <span class="lm-dot"></span></div><div class="lm-trig" onclick="window._lmTog()"><svg width="26" height="26" viewBox="0 0 24 24" fill="white"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg></div></div>\';\n    document.body.appendChild(wrap);\n    function g(id){return document.getElementById(id);}\n    window._lmTog=function(){var c=g(\'lm-card\');s.isOpen=!s.isOpen;c.style.display=s.isOpen?\'block\':\'none\';};\n    window._lmBk=function(){g(\'lm-bk\').style.display=\'none\';home();};\n    function home(){var c=g(\'lm-body\');c.innerHTML=BTNS.map(function(b){return \'<button class="lm-btn" onclick="window._lmForm(&quot;\'+b+\'&quot;)">\'+b+\'</button>\';}).join(\'\');}\n    window._lmForm=function(intent){s.intent=intent;g(\'lm-bk\').style.display=\'block\';g(\'lm-body\').innerHTML=\'<div class="lm-arow"><div class="lm-amsg">\'+AGENT_MSG+\'</div></div><input type="text" id="lm-n" class="lm-inp" placeholder="Tu nombre*"><input type="tel" id="lm-t" class="lm-inp" placeholder="Tu teléfono*"><button id="lm-sub" class="lm-send" onclick="window._lmSend()">ENVIAR SOLICITUD</button><button class="lm-bkf" onclick="window._lmBk()">Volver</button>\';};\n    window._lmSend=function(){var n=g(\'lm-n\').value,ph=g(\'lm-t\').value;if(!n||!ph){alert(\'Por favor, rellena nombre y teléfono\');return;}var btn=g(\'lm-sub\');btn.innerText=\'ENVIANDO...\';btn.disabled=true;function done(){g(\'lm-bk\').style.display=\'none\';g(\'lm-body\').innerHTML=\'<div style="text-align:center;padding:24px 0"><div style="font-size:42px">✅</div><p style="font-weight:700;color:#333;margin-top:10px;font-family:-apple-system,sans-serif">¡Solicitud enviada!<br><span style="font-size:13px;font-weight:400;color:#666">En breve te contactaremos.</span></p></div>\';if(WA_AFTER)setTimeout(function(){window.open(\'https://wa.me/\'+WA+\'?text=\'+encodeURIComponent(\'Hola, soy \'+n+\'. Me interesa: \'+s.intent),\'_blank\');},1200);}if(WEBHOOK){var xhr=new XMLHttpRequest();xhr.open("POST",WEBHOOK,true);xhr.setRequestHeader("Content-Type","application/json");xhr.onreadystatechange=function(){if(xhr.readyState===4)done();};xhr.send(JSON.stringify({firstName:n+\' [\'+s.intent+\']\',phone:ph,source:"CHATBOT WEB",tags:["chatbot","lmanalytics"],notes:"Interés: "+s.intent}));}else{done();}};\n    home();\n    '+(autoOpen?'setTimeout(function(){if(!s.isOpen)window._lmTog();},2500);':'')+'\n  }\n  if(document.readyState===\'complete\')init();\n  else window.addEventListener(\'load\',init);\n})();';
+  }
+
+  // --- COPY ---
+  function copyCode(){
+    var text = document.getElementById('codeOutput').textContent;
+    navigator.clipboard.writeText(text).then(function(){
+      var t = document.getElementById('toast');
+      t.style.display = 'block';
+      setTimeout(function(){ t.style.display='none'; }, 2500);
+    });
+  }
+</script>
+</body>
+</html>
